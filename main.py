@@ -1,6 +1,5 @@
 import random
 import simpy
-
 import networkx as nx
 from node import Node
 import matplotlib.pyplot as plt
@@ -8,7 +7,7 @@ import matplotlib.pyplot as plt
 G = nx.DiGraph()
 env = simpy.Environment()
 pipe = simpy.Store(env)
-id_init = [100, 500, 750]
+id_init = [250, 500, 750]
 nodes = [Node(env, pipe, id_init[i]) for i in range(3)]  # TO FIX FOR n NODES
 
 nodes[0].set_next(nodes[1])
@@ -27,6 +26,9 @@ for i in range(1, 10):
     node.join(nodes)
     nodes.append(node)
     env.run(until=20*i)
+
+
+
 
 
 """
