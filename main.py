@@ -20,14 +20,16 @@ nodes[2].set_prev(nodes[1])
 nodes[1].set_prev(nodes[0])
 
 print('BASE :', nodes[0].id, nodes[1].id, nodes[2].id)
+    
 
-for i in range(1, 10):
+for i in range(1, 3):
     id = random.randint(1, 1000)
     node = Node(env, pipe, id)
     node.join(nodes)
     nodes.append(node)
-    env.run(until=20*i)
+    #env.run(until=20*i)
 
+env.run(until=100)    
 
 """
 for node in nodes:
