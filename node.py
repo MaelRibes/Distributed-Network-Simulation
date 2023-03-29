@@ -59,20 +59,23 @@ class Node(object):
     ############## MESSAGES MANAGEMENT ##############
 
     def message_generator(self, to_, from_, content, env, pipe, data):
-        yield env.timeout(random.randint(6, 10))
+        yield env.timeout(random.randint(1, 4))
         msg = Message(to_, from_, content, env, data)
         pipe.put(msg)
+        print(f'[{self.env.now}][{self.id}][SEND {content}] {self.id} --> {to_.id}')
 
     def send(self, pipe, to, content, data=None):
         self.env.process(self.message_generator(to, self, content, self.env, pipe, data))
         self.env.process(to.receive(self.env, pipe))
-        print(f'[{self.env.now}][{self.id}][SEND {content}] {self.id} --> {to.id}')
+        
 
     def receive(self, env, pipe):
         msg = yield pipe.get()
+        yield env.timeout(random.randint(1, 4))
         self.messages.append(msg)
         print(f'[{self.env.now}][{self.id}][RECEIVE {msg.content}] {msg.from_node.id} --> {msg.to_node.id}')
-        yield env.timeout(random.randint(4, 8))
+        
+        
 
     ############## RUN ENVIRONMENT ##############
     def run(self):
@@ -82,15 +85,15 @@ class Node(object):
                 if msg.content == 'INSERT':
                     self.insert(msg.from_node)
                     self.messages.pop()
-                    yield self.env.timeout(random.randint(4, 8))
+                    yield self.env.timeout(5)
                 elif msg.content == 'LEAVE':
                     if msg.data[0] == "prev":
                         self.set_prev(msg.data[1])
                     else:
                         self.set_next(msg.data[1])
                     self.messages.pop()
-                    yield self.env.timeout(random.randint(4, 8))
+                    yield self.env.timeout(5)
                 else:
-                    yield self.env.timeout(random.randint(4, 8))
+                    yield self.env.timeout(5)
             else:
-                yield self.env.timeout(random.randint(4, 8))
+                yield self.env.timeout(5)
