@@ -25,18 +25,10 @@ for i in range(1, 10):
     node = Node(env, pipe, id)
     node.join(nodes)
     nodes.append(node)
-    env.run(until=20*i)
+    env.run(until=env.now + 10)
 
 nodes[0].leave()
-env.run(until=20*10)
-"""
-for node in nodes:
-    print("----------")
-    print(node.id)
-    print("Prev. :", node.prev.id)
-    print("Next. :", node.next.id)
-    print("----------")
-"""
+env.run(until=env.now + 10)
 
 for i in range(len(nodes) - 1):
     G.add_node(nodes[i].id)

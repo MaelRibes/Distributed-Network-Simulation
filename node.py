@@ -49,12 +49,22 @@ class Node(object):
         from_node.set_prev(self)
         self.next.set_prev(from_node)
         self.set_next(from_node)
+        print(f'[{self.env.now}][{self.id}][NODE INSERTED]')
 
     def leave(self):
-        self.send(self.pipe, self.prev, 'LEAVE', ("next", self.next))
-        self.send(self.pipe, self.next, 'LEAVE', ("prev", self.prev))
+        self.send(self.pipe, self.prev, 'LEAVE', ("NEXT", self.next))
+        self.send(self.pipe, self.next, 'LEAVE', ("PREV", self.prev))
         self.set_prev(self)
         self.set_next(self)
+        
+
+    def nodes_rearrangement(self, msg):
+        if msg.data[0] == "PREV":
+            self.set_prev(msg.data[1])
+        else:
+            self.set_next(msg.data[1])
+        print(f'[{self.env.now}][{self.id}][NEIGHBOURS {msg.data[0]} UPDATED] {msg.data[1].id}')
+
 
     ############## MESSAGES MANAGEMENT ##############
 
@@ -67,14 +77,12 @@ class Node(object):
     def send(self, pipe, to, content, data=None):
         self.env.process(self.message_generator(to, self, content, self.env, pipe, data))
         self.env.process(to.receive(self.env, pipe))
-        
 
     def receive(self, env, pipe):
         msg = yield pipe.get()
         yield env.timeout(random.randint(1, 4))
         self.messages.append(msg)
         print(f'[{self.env.now}][{self.id}][RECEIVE {msg.content}] {msg.from_node.id} --> {msg.to_node.id}')
-        
         
 
     ############## RUN ENVIRONMENT ##############
@@ -83,17 +91,14 @@ class Node(object):
             if len(self.messages) != 0:
                 msg = self.messages[-1]
                 if msg.content == 'INSERT':
+                    yield self.env.timeout(2)
                     self.insert(msg.from_node)
                     self.messages.pop()
-                    yield self.env.timeout(5)
                 elif msg.content == 'LEAVE':
-                    if msg.data[0] == "prev":
-                        self.set_prev(msg.data[1])
-                    else:
-                        self.set_next(msg.data[1])
+                    yield self.env.timeout(1)
+                    self.nodes_rearrangement(msg)
                     self.messages.pop()
-                    yield self.env.timeout(5)
                 else:
                     yield self.env.timeout(5)
             else:
-                yield self.env.timeout(5)
+                yield self.env.timeout(1)
