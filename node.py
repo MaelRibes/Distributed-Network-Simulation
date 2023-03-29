@@ -10,7 +10,7 @@ class Node(object):
         self.id = id
         self.messages = []
         self.pipe = pipe
-        self.next, self.prev = None, None
+        self.next, self.prev = self, self
         self.action = env.process(self.run())
 
     ############## SETTERS ##############
@@ -50,22 +50,28 @@ class Node(object):
         self.next.set_prev(from_node)
         self.set_next(from_node)
 
+    def leave(self):
+        self.send(self.pipe, self.prev, 'LEAVE', ("next", self.next))
+        self.send(self.pipe, self.next, 'LEAVE', ("prev", self.prev))
+        self.set_prev(self)
+        self.set_next(self)
+
     ############## MESSAGES MANAGEMENT ##############
-    def message_generator(self, to_, from_, content, env, pipe):
+
+    def message_generator(self, to_, from_, content, env, pipe, data):
         yield env.timeout(random.randint(6, 10))
-        msg = Message(to_, from_, content, env)
+        msg = Message(to_, from_, content, env, data)
         pipe.put(msg)
 
-    def send(self, pipe, to, content):
-        self.env.process(self.message_generator(to, self, content, self.env, pipe))
+    def send(self, pipe, to, content, data=None):
+        self.env.process(self.message_generator(to, self, content, self.env, pipe, data))
         self.env.process(to.receive(self.env, pipe))
         print(f'[{self.env.now}][{self.id}][SEND {content}] {self.id} --> {to.id}')
 
     def receive(self, env, pipe):
         msg = yield pipe.get()
         self.messages.append(msg)
-        print(
-            f'[{self.env.now}][{self.id}][RECEIVE {msg.content}] {msg.from_node.id} --> {msg.to_node.id}')
+        print(f'[{self.env.now}][{self.id}][RECEIVE {msg.content}] {msg.from_node.id} --> {msg.to_node.id}')
         yield env.timeout(random.randint(4, 8))
 
     ############## RUN ENVIRONMENT ##############
@@ -75,6 +81,13 @@ class Node(object):
                 msg = self.messages[-1]
                 if msg.content == 'INSERT':
                     self.insert(msg.from_node)
+                    self.messages.pop()
+                    yield self.env.timeout(random.randint(4, 8))
+                elif msg.content == 'LEAVE':
+                    if msg.data[0] == "prev":
+                        self.set_prev(msg.data[1])
+                    else:
+                        self.set_next(msg.data[1])
                     self.messages.pop()
                     yield self.env.timeout(random.randint(4, 8))
                 else:

@@ -8,7 +8,7 @@ G = nx.DiGraph()
 env = simpy.Environment()
 pipe = simpy.Store(env)
 id_init = [250, 500, 750]
-nodes = [Node(env, pipe, id_init[i]) for i in range(3)]  # TO FIX FOR n NODES
+nodes = [Node(env, pipe, id_init[i]) for i in range(3)]
 
 nodes[0].set_next(nodes[1])
 nodes[1].set_next(nodes[2])
@@ -27,10 +27,8 @@ for i in range(1, 10):
     nodes.append(node)
     env.run(until=20*i)
 
-
-
-
-
+nodes[0].leave()
+env.run(until=20*10)
 """
 for node in nodes:
     print("----------")
@@ -39,7 +37,6 @@ for node in nodes:
     print("Next. :", node.next.id)
     print("----------")
 """
-
 
 for i in range(len(nodes) - 1):
     G.add_node(nodes[i].id)
