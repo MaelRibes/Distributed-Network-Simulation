@@ -69,7 +69,7 @@ class Node(object):
     ############## MESSAGES MANAGEMENT ##############
 
     def message_generator(self, to_, from_, content, env, pipe, data):
-        yield env.timeout(random.randint(1, 4))
+        yield env.timeout(1)
         msg = Message(to_, from_, content, env, data)
         pipe.put(msg)
         print(f'[{self.env.now}][{self.id}][SEND {content}] {self.id} --> {to_.id}')
