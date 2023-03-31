@@ -27,12 +27,31 @@ for i in range(1, 10):
     nodes.append(node)
     env.run(until=env.now + 10)
 
-nodes[0].leave()
-env.run(until=env.now + 10)
+"""nodes[0].leave()
+env.run(until=env.now + 10)"""
 
-for i in range(len(nodes) - 1):
+nodes[0].put(("Seb", "seb.c"), nodes)
+env.run(until=env.now + 20)
+
+nodes[0].put(("Kavé", "kave.mp4"), nodes)
+env.run(until=env.now + 20)
+
+nodes[0].put(("Flav", "flav.sql"), nodes)
+env.run(until=env.now + 20)
+
+nodes[0].put(("Sorana", "soso.java"), nodes)
+env.run(until=env.now + 20)
+
+nodes[5].get("Kavé", nodes)
+env.run(until=env.now + 20)
+
+for node in nodes:
+    print(node.id, " : ", node.hashtable)
+
+########## NETWORKX ##########
+"""for i in range(len(nodes) - 1):
     G.add_node(nodes[i].id)
     G.add_edge(nodes[i].prev.id, nodes[i].id)
     G.add_edge(nodes[i].id, nodes[i].next.id)
 nx.draw(G, with_labels=True)
-plt.show()
+plt.show()"""

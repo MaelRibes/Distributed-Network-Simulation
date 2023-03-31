@@ -49,7 +49,7 @@ Le projet à donc une structure plutôt simple : un fichier *node.py* qui permet
 
 ## Fonctionnalités et choix effectués
 
-décrire les fonctionnalités (ordre noeuds dans la dht, fonction find etc.) et comment ca marche
+décrire les fonctionnalités (ordre noeuds dans la dht, fonction find triche etc.) et comment ca marche
 justifier nos choix (timeouts par exemple, fait qu'on a pas sécurisé le réseau (on vérifie pas avant d'ajouter un noeud qu'il n'appartient pas deja a la dht))
 
 
