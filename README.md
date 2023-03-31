@@ -4,7 +4,7 @@
 </p>
 Ce projet est une simulation d'un système de réseau distribué. Il utilise la bibliothèque SimPy pour simuler le passage de messages à travers un réseau de nœuds.
 
-<br>
+
 
 ## Installation 
 
@@ -13,7 +13,7 @@ Pour exécuter cette simulation, vous devez installer Python 3 et les bibliothè
 pip install simpy networkx
 ```
 
-<br>
+
 
 ## Usages
 Pour lancer la simulation, il suffit d'exécuter le fichier *main.py*:
@@ -25,7 +25,7 @@ Il créera un réseau de trois nœuds. Il ajoutera ensuite d'autres nœuds au r�
 
 Après avoir exécuté la simulation, un graphique du réseau sera affiché à l'aide de la bibliothèque [NetworkX](https://networkx.org/documentation/stable/tutorial.html).
 
-<br>
+
 
 ## Introduction et objectifs
 
@@ -37,7 +37,7 @@ Une clé est une chaîne de caractères qui est associée à une valeur, qui peu
 
 Afin de simuler les noeuds et leurs différentes interactions (envoie et réception de messages), nous avons utilisé la librairie [SimPy](https://simpy.readthedocs.io/en/latest/) pour simuler les délais de génération, de réception et de traitement des messages.
 
-<br>
+
 
 ## Structure du projet
 
@@ -45,7 +45,7 @@ L'intérêt d'une DHT est de proposer une structure de données totalement déce
 
 Le projet à donc une structure plutôt simple : un fichier *node.py* qui permet de définir les noeuds et leurs comportements, *message.py* qui constitue simplement la classe **Message** que les noeuds utilisent pour communiquer et *main.py* qui permet de lancer la simulation et tester les fonctionnalités du projet.
 
-<br>
+
 
 ## Fonctionnalités et choix effectués
 
@@ -59,7 +59,7 @@ expliquer ici que les logs on été super important pour comprendre comment fonc
 
 ## Difficultés et bugs
 
-<br>
+
 
 ## Documentation
 
