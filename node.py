@@ -78,7 +78,7 @@ class Node(object):
         entry = abs(hash(key))%1000
         contact = self.find_node(entry, nodes)
         if self.id == contact.id:
-           print(self.data[key])
+           print(self.hashtable[entry])
         else:
            self.send(self.pipe, contact, 'GET', entry)
     
