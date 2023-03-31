@@ -12,6 +12,7 @@ class Node(object):
         self.pipe = pipe
         self.next, self.prev = self, self
         self.action = env.process(self.run())
+        self.data = {}
 
     ############## SETTERS ##############
     def set_next(self, next):
@@ -19,12 +20,14 @@ class Node(object):
 
     def set_prev(self, prev):
         self.prev = prev
+    
+    def add_data(self, key, value):
+        self.data[key] = value
 
     ############## ADD NODES TO DHT ##############
     def join(self, nodes):
         contact = self.find(nodes)
         self.send(self.pipe, contact, 'INSERT')
-        # yield self.env.process(self.find(nodes)) #waiting for the node to be insert in the network
 
     def find(self, nodes):
         print(f'[{self.env.now}][{self.id}][SEARCHING CONTACT]')
@@ -43,8 +46,6 @@ class Node(object):
             print(f'[{self.env.now}][{self.id}][TRYING TO JOIN] {contact.id}')
         print(f'[{self.env.now}][{self.id}][CONTACT FOUND] {contact.id}')
         return contact
-        
-        # yield self.env.process(self.insert(contact))
 
     def insert(self, from_node):
         from_node.set_next(self.next)
@@ -58,45 +59,45 @@ class Node(object):
         self.send(self.pipe, self.next, 'LEAVE', ("PREV", self.prev))
         self.set_prev(self)
         self.set_next(self)
-        
 
     def nodes_rearrangement(self, msg):
-        if msg.data[0] == "PREV":
-            self.set_prev(msg.data[1])
+        if msg.content[0] == "PREV":
+            self.set_prev(msg.content[1])
         else:
-            self.set_next(msg.data[1])
-        print(f'[{self.env.now}][{self.id}][NEIGHBOURS {msg.data[0]} UPDATED] {msg.data[1].id}')
+            self.set_next(msg.content[1])
+        print(f'[{self.env.now}][{self.id}][NEIGHBOURS {msg.content[0]} UPDATED] {msg.content[1].id}')
 
 
     ############## MESSAGES MANAGEMENT ##############
 
-    def message_generator(self, to_, from_, content, env, pipe, data):
+    def message_generator(self, to_, from_, type, env, pipe, content):
         yield env.timeout(1)
-        msg = Message(to_, from_, content, env, data)
+        msg = Message(to_, from_, type, env, content)
         pipe.put(msg)
-        print(f'[{self.env.now}][{self.id}][SEND {content}] {self.id} --> {to_.id}')
+        print(f'[{self.env.now}][{self.id}][SEND {type}] {self.id} --> {to_.id}')
 
-    def send(self, pipe, to, content, data=None):
-        self.env.process(self.message_generator(to, self, content, self.env, pipe, data))
-        self.env.process(to.receive(self.env, pipe))
+    def send(self, pipe, to, type, content=None):
+        self.env.process(self.message_generator(to, self, type, self.env, pipe, content))
+        self.env.process(to.receive(pipe))
 
-    def receive(self, env, pipe):
+    def receive(self, pipe):
         msg = yield pipe.get()
-        yield env.timeout(random.randint(1, 4))
+        yield self.env.timeout(random.randint(1, 4))
         self.messages.append(msg)
-        print(f'[{self.env.now}][{self.id}][RECEIVE {msg.content}] {msg.from_node.id} --> {msg.to_node.id}')
+        print(f'[{self.env.now}][{self.id}][RECEIVE {msg.type}] {msg.from_node.id} --> {msg.to_node.id}')
         
 
     ############## RUN ENVIRONMENT ##############
+    
     def run(self):
         while True:
             if len(self.messages) != 0:
                 msg = self.messages[-1]
-                if msg.content == 'INSERT':
+                if msg.type == 'INSERT':
                     yield self.env.timeout(2)
                     self.insert(msg.from_node)
                     self.messages.pop()
-                elif msg.content == 'LEAVE':
+                elif msg.type == 'LEAVE':
                     yield self.env.timeout(1)
                     self.nodes_rearrangement(msg)
                     self.messages.pop()
