@@ -1,4 +1,5 @@
-#  Distributed Network Simulation 
+#  Distributed Network Simulation
+Auteurs : HIPPOLITE Axel, RIBES Maël & WALLERAND Alex
 <p align="center"> 
 <img src="src\SimPy_logo.png" width=150> <img src="src\networkx_logo.svg" width=300>
 </p>
