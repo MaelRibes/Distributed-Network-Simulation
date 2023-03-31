@@ -22,7 +22,8 @@ class Node(object):
 
     ############## ADD NODES TO DHT ##############
     def join(self, nodes):
-        self.find(nodes)
+        contact = self.find(nodes)
+        self.send(self.pipe, contact, 'INSERT')
         # yield self.env.process(self.find(nodes)) #waiting for the node to be insert in the network
 
     def find(self, nodes):
@@ -41,7 +42,8 @@ class Node(object):
                 contact = contact.next
             print(f'[{self.env.now}][{self.id}][TRYING TO JOIN] {contact.id}')
         print(f'[{self.env.now}][{self.id}][CONTACT FOUND] {contact.id}')
-        self.send(self.pipe, contact, 'INSERT')
+        return contact
+        
         # yield self.env.process(self.insert(contact))
 
     def insert(self, from_node):
